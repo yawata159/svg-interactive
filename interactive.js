@@ -9,13 +9,15 @@ function circleListener(e) {
         this.setAttribute("fill", "purple");
     }
     else {
-        this.setAttribute("cx",Math.floor(Math.random() * 501));
-        this.setAttribute("cy",Math.floor(Math.random() * 501));
+        this.remove();
+        var x = Math.floor(Math.random() * (+svg.getAttribute("width")+1));
+        var y = Math.floor(Math.random() * (+svg.getAttribute("height")+1));
+        drawCircle(x,y,20);
     }
     e.stopPropagation();
 }
 
-function newCircle(x,y,r) {
+function drawCircle(x,y,r) {
     var ret = document.createElementNS(ns, "circle");
     ret.setAttribute("cx", x);
     ret.setAttribute("cy", y);
@@ -24,15 +26,27 @@ function newCircle(x,y,r) {
 
     ret.addEventListener("click", circleListener);
 
-    return ret;
+    svg.appendChild(ret);
 }
 
-function newDot(e) {
+function newCircle(e) {
     var x = e.offsetX;
     var y = e.offsetY;
 
-    var circle = newCircle(x, y, 20);
-    svg.appendChild(circle);
+    drawCircle(x, y, 20);
 }
 
-svg.addEventListener("click", newDot);
+function bounceCircles(e) {
+    console.log("bounce");
+    // magic 
+}
+
+function clearSVG(e) {
+    while (svg.firstChild) {
+        svg.removeChild(svg.firstChild);
+    }
+}
+
+svg.addEventListener("click", newCircle);
+move.addEventListener("click", bounceCircles);
+clear.addEventListener("click", clearSVG);
