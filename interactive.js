@@ -3,6 +3,7 @@ var ns = "http://www.w3.org/2000/svg";
 var svg = document.getElementById("s");
 var move = document.getElementById("move");
 var clear = document.getElementById("clear");
+var stop = document.getElementById("stop");
 
 var rid = 0;
 
@@ -14,17 +15,20 @@ function circleListener(e) {
         this.remove();
         var x = Math.floor(Math.random() * (+svg.getAttribute("width")+1));
         var y = Math.floor(Math.random() * (+svg.getAttribute("height")+1));
-        drawCircle(x,y,40);
+        drawCircle(x,y);
     }
     e.stopPropagation();
 }
 
-function drawCircle(x,y,r) {
+function drawCircle(x,y) {
     var ret = document.createElementNS(ns, "circle");
     ret.setAttribute("cx", x);
     ret.setAttribute("cy", y);
-    ret.setAttribute("r", r);
+    ret.setAttribute("r", 20);
     ret.setAttribute("fill", "red");
+
+    ret.xdir = 1;
+    ret.ydir = 1;
 
     ret.addEventListener("click", circleListener);
 
@@ -35,32 +39,37 @@ function newCircle(e) {
     var x = e.offsetX;
     var y = e.offsetY;
 
-    drawCircle(x, y, 40);
+    drawCircle(x, y);
 }
 
 function bounceCircles(e) {
-    window.cancelAnimationFrame( rid );
-    function move(circle) {
-	var xspeed = 2;
-	var yspeed = 2;
-	function move2() {
-	    var x = parseInt(circle.getAttribute("cx"));
-	    var y = parseInt(circle.getAttribute("cy"));
-	    if (x >= parseInt(svg.getAttribute("width")) - parseInt(circle.getAttribute("r")) || x <= parseInt(circle.getAttribute("r"))) {
-		xspeed = -xspeed;
-	    }
-            if (y >= parseInt(svg.getAttribute("height")) - parseInt(circle.getAttribute("r")) || y <= parseInt(circle.getAttribute("r"))) {
-                yspeed = -yspeed;
-	    }
-	    circle.setAttribute("cx",x + xspeed);
-	    circle.setAttribute("cy",y + yspeed);
-	    rid = window.requestAnimationFrame( move2 );
-	}
-	move2();
+    window.cancelAnimationFrame(rid);
+
+    function move() {
+        var circles = svg.children;
+    
+        for (var i = 0; i < circles.length; i++) {
+            var circle = circles[i];
+            var x = +circle.getAttribute("cx");
+            var y = +circle.getAttribute("cy");
+            var r = +circle.getAttribute("r");
+
+
+            if (x <= r) circle.xdir = 1;
+            else if (x >= svg.getAttribute("width") - r) circle.xdir = - 1;
+
+            if (y <= r) circle.ydir =  1;
+            else if (y >= svg.getAttribute("height") - r) circle.ydir =  - 1;
+
+            circle.setAttribute("cx", x + +circle.xdir);
+            circle.setAttribute("cy", y + +circle.ydir);
+
+        }
+
+        rid = window.requestAnimationFrame(move);
     }
-    for (i = 1; i < svg.childNodes.length; i++){
-	move(svg.childNodes[i]);
-    }
+    move()
+
 }
 
 function clearSVG(e) {
@@ -69,6 +78,11 @@ function clearSVG(e) {
     }
 }
 
+function stopIt(e) {
+    window.cancelAnimationFrame(rid);
+}
+
 svg.addEventListener("click", newCircle);
 move.addEventListener("click", bounceCircles);
 clear.addEventListener("click", clearSVG);
+stop.addEventListener("click", stopIt);
