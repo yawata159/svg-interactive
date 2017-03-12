@@ -1,5 +1,6 @@
 var ns = "http://www.w3.org/2000/svg";
 var svg = document.getElementById("s");
+var rand = document.getElementById("random");
 var move = document.getElementById("move");
 var clear = document.getElementById("clear");
 var stop = document.getElementById("stop");
@@ -8,6 +9,12 @@ var rid = 0;
 
 function newCircle(e) {
     regularCircle(e.offsetX, e.offsetY);
+}
+
+function randCircle(e) {
+    var x = Math.floor(Math.random() * (+svg.getAttribute("width")+1));
+    var y = Math.floor(Math.random() * (+svg.getAttribute("height")+1));
+    regularCircle(x, y);
 }
 
 function regularCircle(x,y) {
@@ -36,9 +43,7 @@ function circleListener(e) {
     }
     else {
         this.remove();
-        var x = Math.floor(Math.random() * (+svg.getAttribute("width")+1));
-        var y = Math.floor(Math.random() * (+svg.getAttribute("height")+1));
-        regularCircle(x, y);
+        randCircle();
     }
     e.stopPropagation();
 }
@@ -95,6 +100,7 @@ function stopIt(e) {
 }
 
 svg.addEventListener("click", newCircle);
+rand.addEventListener("click", randCircle);
 move.addEventListener("click", bounceCircles);
 clear.addEventListener("click", clearSVG);
 stop.addEventListener("click", stopIt);
